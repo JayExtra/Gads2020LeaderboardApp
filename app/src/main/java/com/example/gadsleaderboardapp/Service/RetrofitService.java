@@ -3,6 +3,7 @@ package com.example.gadsleaderboardapp.Service;
 import com.example.gadsleaderboardapp.Api.ApiInterface;
 import com.example.gadsleaderboardapp.Models.Hours;
 import com.example.gadsleaderboardapp.Models.Skill;
+import com.example.gadsleaderboardapp.Models.Submit;
 
 import java.util.List;
 
@@ -45,4 +46,6 @@ public class RetrofitService {
     public Call<List<Skill>> getSkillIq(){
         return  mApiInterface.getSkillIq();
     }
+
+
 }

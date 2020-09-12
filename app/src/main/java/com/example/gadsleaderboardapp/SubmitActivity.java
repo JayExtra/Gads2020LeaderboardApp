@@ -11,6 +11,17 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
+
+import com.example.gadsleaderboardapp.Api.ApiInterface;
+import com.example.gadsleaderboardapp.Models.Submit;
+import com.example.gadsleaderboardapp.Service.RetrofitService;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class SubmitActivity extends AppCompatActivity {
 
@@ -20,10 +31,17 @@ public class SubmitActivity extends AppCompatActivity {
     private EditText fNme ,sName , eMail , mLink;
     private Button submitBtn , buttonYes;
 
+    private ApiInterface mApiInterface;
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_submit);
+
+
+
 
         myDialog=new Dialog(this);
 
@@ -36,6 +54,14 @@ public class SubmitActivity extends AppCompatActivity {
         submitBtn = findViewById(R.id.submit_proj_btn);
 
 
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl( "https://gadsapi.herokuapp.com/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        mApiInterface = retrofit.create(ApiInterface.class);
+
+
         bckImageView.setOnClickListener(view -> {
             Intent bckIntent = new Intent(SubmitActivity.this , HomeActivity.class);
             startActivity(bckIntent);
@@ -44,7 +70,11 @@ public class SubmitActivity extends AppCompatActivity {
 
         submitBtn.setOnClickListener(view -> {
 
-            myDialog.setContentView(R.layout.you_sure);
+            Toast.makeText(SubmitActivity.this , "Sending..." , Toast.LENGTH_LONG).show();
+
+            startSubmission();
+
+          /*  myDialog.setContentView(R.layout.you_sure);
             cancel=(ImageView) myDialog.findViewById(R.id.cancel_img);
             buttonYes=(Button) myDialog.findViewById(R.id.button_yes);
 
@@ -52,18 +82,49 @@ public class SubmitActivity extends AppCompatActivity {
 
             buttonYes.setOnClickListener(view12 -> {
 
-               startSubmission();
+
                 myDialog.dismiss();
 
             });
 
             myDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-            myDialog.show();
+            myDialog.show();*/
 
         });
     }
 
     private void startSubmission() {
+
+      String firstame =   fNme.getText().toString();
+        String secondname =sName.getText().toString();
+       String email =  eMail.getText().toString();
+       String gitlink =  mLink.getText().toString();
+
+
+        //Submit submission = new Submit(email,firstame,secondname ,gitlink);
+
+        Call<Submit> call = mApiInterface.createSubmit(email ,firstame , secondname ,gitlink);
+        call.enqueue(new Callback<Submit>() {
+            @Override
+            public void onResponse(Call<Submit> call, Response<Submit> response) {
+                if(!response.isSuccessful()){
+                    Toast.makeText(SubmitActivity.this, "Submission successfull" ,Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Submit> call, Throwable t) {
+
+                Toast.makeText(SubmitActivity.this, "Submission failed"+t.getMessage() ,Toast.LENGTH_SHORT).show();
+
+
+            }
+        });
+
+
+
+
+
 
 
     }
